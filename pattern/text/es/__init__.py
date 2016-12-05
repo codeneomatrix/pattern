@@ -34,10 +34,6 @@ from pattern.text.tree import (
     Tree, Text, Sentence, Slice, Chunk, PNPChunk, Chink, Word, table,
     SLASH, WORD, POS, CHUNK, PNP, REL, ANCHOR, LEMMA, AND, OR
 )
-# Import spelling base class.
-from pattern.text import (
-    Spelling
-)
 # Import verb tenses.
 from pattern.text import (
     INFINITIVE, PRESENT, PAST, FUTURE, CONDITIONAL,
@@ -198,9 +194,8 @@ class Parser(_Parser):
         return _Parser.find_tags(self, tokens, **kwargs)
 
 parser = Parser(
-     lexicon = os.path.join(MODULE, "es-lexicon.txt"),
-   frequency = os.path.join(MODULE, "es-frequency.txt"),
-  morphology = os.path.join(MODULE, "es-morphology.txt"),
+     lexicon = os.path.join(MODULE, "es-lexicon.txt"), 
+  morphology = os.path.join(MODULE, "es-morphology.txt"), 
      context = os.path.join(MODULE, "es-context.txt"),
      default = ("NCS", "NP", "Z"),
     language = "es"
@@ -208,52 +203,34 @@ parser = Parser(
 
 lexicon = parser.lexicon # Expose lexicon.
 
-spelling = Spelling(
-        path = os.path.join(MODULE, "es-spelling.txt")
-)
-
 def tokenize(s, *args, **kwargs):
-    """ Returns a list of sentences, where punctuation marks have been split from words.
+    """ Devuelve una lista de oraciones, donde se han dividido los signos de puntuación de las palabras.
     """
     return parser.find_tokens(s, *args, **kwargs)
 
 def parse(s, *args, **kwargs):
-    """ Returns a tagged Unicode string.
+    """ Devuelve una cadena Unicode etiquetada.
     """
     return parser.parse(s, *args, **kwargs)
 
 def parsetree(s, *args, **kwargs):
-    """ Returns a parsed Text from the given string.
+    """ Devuelve un texto analizado de la cadena dada.
     """
     return Text(parse(s, *args, **kwargs))
 
 def tree(s, token=[WORD, POS, CHUNK, PNP, REL, LEMMA]):
-    """ Returns a parsed Text from the given parsed string.
+    """ Devuelve un texto analizado de la cadena analizada dada.
     """
     return Text(s, token)
     
 def tag(s, tokenize=True, encoding="utf-8", **kwargs):
-    """ Returns a list of (token, tag)-tuples from the given string.
+    """ Devuelve una lista de (token, tag) -tuples de la cadena dada.
     """
     tags = []
     for sentence in parse(s, tokenize, True, False, False, False, encoding, **kwargs).split():
         for token in sentence:
             tags.append((token[0], token[1]))
     return tags
-
-def keywords(s, top=10, **kwargs):
-    """ Returns a sorted list of keywords in the given string.
-    """
-    return parser.find_keywords(s, **dict({
-        "frequency": parser.frequency,
-              "top": top,
-              "pos": ("NN",),
-           "ignore": ("rt",)}, **kwargs))
-
-def suggest(w):
-    """ Returns a list of (word, confidence)-tuples of spelling corrections.
-    """
-    return spelling.suggest(w)
 
 split = tree # Backwards compatibility.
 

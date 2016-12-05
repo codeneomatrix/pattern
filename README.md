@@ -10,7 +10,6 @@ Pattern is a web mining module for Python. It has tools for:
 
 It is well documented and bundled with 50+ examples and 350+ unit tests. The source code is licensed under BSD and available from <http://www.clips.ua.ac.be/pages/pattern>.
 
-![Pattern example workflow](http://www.clips.ua.ac.be/media/pattern_schema.gif)
 
 Version
 -------
@@ -29,11 +28,6 @@ Pattern is written for Python 2.5+ (no support for Python 3 yet). The module has
 ```bash
 cd pattern-2.6
 python setup.py install
-```
-
-If you have pip, you can automatically download and install from the PyPi repository:
-```bash
-pip install pattern
 ```
 
 If none of the above works, you can make Python aware of the module in three ways:
@@ -74,6 +68,31 @@ for i in range(1, 3):
 
 print knn.classify('sweet potato burger')
 print knn.classify('stupid autocorrect')
+```
+
+
+Example PARSE
+------- 
+```python
+from pattern.es import parse, split
+  
+s = parse('El gato negro se sienta en la silla.')
+
+s.split()
+
+[
+  [
+    [u'El', u'DT', u'B-NP', u'O'],
+    [u'gato', u'NN', u'I-NP', u'O'],
+    [u'negro', u'JJ', u'I-NP', u'O'],
+    [u'se', u'PRP', u'B-NP', u'O'],
+    [u'sienta', u'VB', u'B-VP', u'O'],
+    [u'en', u'IN', u'B-PP', u'B-PNP'],
+    [u'la', u'DT', u'B-NP', u'I-PNP'],
+    [u'silla', u'NN', u'I-NP', u'I-PNP'],
+    [u'.', u'.', u'O', u'O']
+  ]
+]
 ```
 
 Documentation
