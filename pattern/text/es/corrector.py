@@ -1,36 +1,60 @@
 import re
 from collections import Counter
 
-def words(text): return re.findall(r'\w+', text.lower())
+def palabras(text): return re.findall(r'\w+', text.lower())
 
-WORDS = Counter(words(open('big.txt').read()))
+#def tokens(text): return (text.lower()).split() 
 
-def P(word, N=sum(WORDS.values())): 
-    "Probability of `word`."
-    return WORDS[word] / N
+conjunto_palabras = Counter(palabras(open('texto2.txt').read()))
 
-def correction(word): 
-    "Most probable spelling correction for word."
-    return max(candidates(word), key=P)
+def P(palabra, N=sum(conjunto_palabras.values())): 
+    "probabilidad de la `palabra`."
+    return conjunto_palabras[palabra] / N
 
-def candidates(word): 
-    "Generate possible spelling corrections for word."
-    return (known([word]) or known(edits1(word)) or known(edits2(word)) or [word])
+def combinacion1(palabra):
+    "Todas las versiones  de  una  `palabra`."
+    letras         = 'abcdefghijklmnopqrstuvwxyz'
+    separadores    = [(palabra[:i], palabra[i:])    for i in range(len(palabra) + 1)]
+    eliminaciones  = [L + R[1:]               for L, R in separadores if R]
+    trasposisiones = [L + R[1] + R[0] + R[2:] for L, R in separadores if len(R)>1]
+    remplazos      = [L + c + R[1:]           for L, R in separadores if R for c in letras]
+    inserciones    = [L + c + R               for L, R in separadores for c in letras]
+    return set(eliminaciones + trasposisiones + remplazos + inserciones)
 
-def known(words): 
-    "The subset of `words` that appear in the dictionary of WORDS."
-    return set(w for w in words if w in WORDS)
+def combinacion2(palabra): 
+    "Todas las versiones  de  una  `palabra`."
+    return (e2 for e1 in combinacion1(palabra) for e2 in combinacion1(e1))
 
-def edits1(word):
-    "All edits that are one edit away from `word`."
-    letters    = 'abcdefghijklmnopqrstuvwxyz'
-    splits     = [(word[:i], word[i:])    for i in range(len(word) + 1)]
-    deletes    = [L + R[1:]               for L, R in splits if R]
-    transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R)>1]
-    replaces   = [L + c + R[1:]           for L, R in splits if R for c in letters]
-    inserts    = [L + c + R               for L, R in splits for c in letters]
-    return set(deletes + transposes + replaces + inserts)
+def buscar(palabras): 
+    "El subconjunto de `palabras` que aparecen en el diccionario de PALABRAS."
+    return set(w for w in palabras if w in conjunto_palabras)
 
-def edits2(word): 
-    "All edits that are two edits away from `word`."
-    return (e2 for e1 in edits1(word) for e2 in edits1(e1))
+def candidatos(palabra): 
+    "Generar posibles correcciones ortográficas para la palabra."
+    return (buscar([palabra]) or buscar(combinacion1(palabra)) or buscar(combinacion2(palabra)) or [palabra])
+
+def candidatos2(palabra): 
+    "Generar posibles correcciones ortográficas para la palabra."
+    return (buscar([palabra]) or buscar(combinacion1(palabra)) or [palabra])    
+
+def correccion(palabra): 
+    "Corrección ortográfica más probable por palabra."
+    return max(candidatos2(palabra), key=P)
+
+def formato(text):
+    "Devuelve la función de caso apropiada para el texto: minuscula,mayuscula, título o simplemente texto."
+    return (str.upper if text.isupper() else
+            str.lower if text.islower() else
+            str.title if text.istitle() else
+            str)
+
+def corregir_coincidencia(match):
+    "Corrección ortográfica de la palabra en coincidencia, y preservar el formato minusculas/mayusculas/titulo."
+    word = match.group()
+    return formato(word)(correccion(word.lower()))
+
+def corregir_texto(texto):
+    return re.sub('[a-zA-Z]+', corregir_coincidencia, texto)
+
+
+#corregir_texto('sirve que checas el cpu')
