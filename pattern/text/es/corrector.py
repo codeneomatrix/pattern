@@ -30,26 +30,26 @@ def buscar(palabras):
     return set(w for w in palabras if w in conjunto_palabras)
 
 def candidatos(palabra): 
-    "Generar posibles correcciones ortográficas para la palabra."
+    "Generar posibles correcciones ortograficas para la palabra."
     return (buscar([palabra]) or buscar(combinacion1(palabra)) or buscar(combinacion2(palabra)) or [palabra])
 
 def candidatos2(palabra): 
-    "Generar posibles correcciones ortográficas para la palabra."
+    "Generar posibles correcciones ortograficas para la palabra."
     return (buscar([palabra]) or buscar(combinacion1(palabra)) or [palabra])    
 
 def correccion(palabra): 
-    "Corrección ortográfica más probable por palabra."
+    "Correccion ortografica mas probable por palabra."
     return max(candidatos2(palabra), key=P)
 
 def formato(text):
-    "Devuelve la función de caso apropiada para el texto: minuscula,mayuscula, título o simplemente texto."
+    "Devuelve la funcion de caso apropiada para el texto: minuscula,mayuscula, titulo o simplemente texto."
     return (str.upper if text.isupper() else
             str.lower if text.islower() else
             str.title if text.istitle() else
             str)
 
 def corregir_coincidencia(match):
-    "Corrección ortográfica de la palabra en coincidencia, y preservar el formato minusculas/mayusculas/titulo."
+    "Correccion ortografica de la palabra en coincidencia, y preservar el formato minusculas/mayusculas/titulo."
     word = match.group()
     return formato(word)(correccion(word.lower()))
 
