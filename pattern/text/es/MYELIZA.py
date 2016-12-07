@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #import random
 import re
-from pattern.es import *
+from __init__ import *
 from corrector import *
 
 """
@@ -295,6 +295,8 @@ def analisis2(sentencia):
 			print ("identifico una hora ",match2)
 		if(match1):
 			print data["respuesta"]
+		else:
+			analisis1(correccion)
 		
 
 
